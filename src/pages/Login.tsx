@@ -4,7 +4,7 @@ import {IoFastFoodOutline} from "react-icons/io5";
 function Login() {
     return (
         <>
-            <div className="flex min-h-full items-center justify-center py-28 px-4 sm:px-6 lg:px-8">
+            <div className="flex min-h-[80%] items-center justify-center px-4 sm:px-6 lg:px-8">
                 <div className="card w-120 bg-base-100 shadow-xl px-6 py-12">
                     <div className="w-full max-w-md space-y-8">
                         <div>
