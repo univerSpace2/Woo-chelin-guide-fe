@@ -3,33 +3,39 @@
 import React from 'react';
 
 interface TableProps {
-    className?: string;
+    tableClassName?: string;
+    tableHeadClassName?: string;
+    tableBodyClassName?: string;
     header: string[];
-    data: any[];
+    data: string[][];
 }
 
-const Table: React.FC<TableProps> = ({ className, header, data }) => {
+const Table: React.FC<TableProps> = ({tableClassName, tableHeadClassName, tableBodyClassName, header, data}) => {
     return (
-        <div className={`table w-full ${className}`}>
-            <div className="table-row-group">
-                <div className="table-row">
-                    {header.map((value, index) => (
-                        <div className="table-cell" key={index}>
-                            {value}
-                        </div>
-                    ))}
-                </div>
-                {data.map((value, index) => (
-                    <div className="table-row" key={index}>
-                        {Object.keys(value).map((key, index) => (
-                            <div className="table-cell" key={index}>
-                                {value[key]}
-                            </div>
-                        ))}
-                    </div>
+        <table className={`table w-full ${tableClassName}`}>
+            <thead>
+            <tr>
+                {header.map((value, index) => (
+                    <th key={index} className={`${tableHeadClassName}`}>
+                        {value}
+                    </th>
                 ))}
-            </div>
-        </div>
+
+            </tr>
+            </thead>
+            <tbody>
+            {data.map((value, index) => (
+                <tr key={index}>
+                    <th>{index+1}</th>
+                    {value.map((value, index) => (
+                        <td key={index} className={`${tableBodyClassName}`}>
+                            {value}
+                        </td>
+                    ))}
+                </tr>
+            ))}
+            </tbody>
+        </table>
     );
 };
 

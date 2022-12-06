@@ -1,35 +1,34 @@
 import React, {useEffect, useState} from "react";
 import {MapMarker, Map, useMap} from "react-kakao-maps-sdk";
+import Table from "../components/Table";
 // home page route
 
 
 const position = [
     {
-        content: <div className="bg-red-400"> 데마코 </div>,
-        title: "데마코",
-        latlng: { lat: 37.51054325607445, lng: 127.04402858708399 },
-    },
-    {
         content: <div className="bg-white"> 수락정 </div>,
         title: "수락정",
         latlng: { lat: 37.51165526340373, lng: 127.0435756804201 },
+        type: "K"
     },
     {
         content: <div className="bg-white"> 행복한 김치찌개 </div>,
         title: "행복한 김치찌개",
         latlng: { lat: 37.511094601359964, lng: 127.04421440535162 },
+        type: "K"
     },
     {
         content: <div className="bg-white"> 바나프레소 선정릉점 </div>,
         title: "바나프레소 선정릉점",
         latlng: { lat: 37.5098946986603, lng: 127.0435814432 },
+        type: "C"
     },
 ]
+
 // @ts-ignore
 const EventMarkerContainer = ({ position, content }) => {
     const map = useMap()
     const [isVisible, setIsVisible] = useState(false)
-
     return (
         <MapMarker
             position={position} // 마커를 표시할 위치
@@ -42,7 +41,19 @@ const EventMarkerContainer = ({ position, content }) => {
         </MapMarker>
     )
 }
+
+
 function Home() {
+    const data = position.map((value, index) => {
+        if(value.type === "K") {
+            return [value.title, "한식"]
+        }
+        else if(value.type === "C") {
+            return [value.title, "카페"]
+        }
+        return [value.title, value.type]
+    }, [])
+    const header = ["","이름", "종류"]
 
     return (
         <>
@@ -73,32 +84,7 @@ function Home() {
                             </button>
                         </div>
                     </div>
-                    <table className="table w-full mt-3">
-                        <thead>
-                        <tr>
-                            <th className="bg-orange-200"></th>
-                            <th className="bg-orange-200">이름</th>
-                            <th className="bg-orange-200">종류</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <th>1</th>
-                            <td>행복한 김치찌개</td>
-                            <td>한식</td>
-                        </tr>
-                        <tr>
-                            <th>2</th>
-                            <td>수락정</td>
-                            <td>분식</td>
-                        </tr>
-                        <tr>
-                            <th>3</th>
-                            <td>바나프레소 선정릉역점</td>
-                            <td>카페</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    <Table header={header} data={data} tableClassName="mt-3" tableHeadClassName="bg-orange-200"/>
                 </div>
             </div>
         </main>
