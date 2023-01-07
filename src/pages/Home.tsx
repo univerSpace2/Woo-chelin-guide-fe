@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect as UE, useState as US, useMemo as UM, FormEvent} from "react";
 import {MapMarker, Map, useMap} from "react-kakao-maps-sdk";
 import Table from "../components/Table";
+import axios from "axios";
 // home page route
-
-
 const position = [
     {
         content: <div className="bg-white"> 수락정 </div>,
@@ -24,11 +23,10 @@ const position = [
         type: "C"
     },
 ]
-
 // @ts-ignore
 const EventMarkerContainer = ({ position, content }) => {
     const map = useMap()
-    const [isVisible, setIsVisible] = useState(false)
+    const [isVisible, setIsVisible] = US(false)
     return (
         <MapMarker
             position={position} // 마커를 표시할 위치
@@ -43,7 +41,19 @@ const EventMarkerContainer = ({ position, content }) => {
 }
 
 
+
+
 function Home() {
+    const [searchResults,setSearchResult] = US<Documents[]>([])
+    const [searchQuery,setSearchQuery] = US<string>('')
+
+    const onChangeSearch = (e:any)=> {
+        const {value, name} = e.target
+        setSearchQuery(value)
+    }
+    const query = searchQuery
+    const queryResult = searchResults
+
     const data = position.map((value, index) => {
         if(value.type === "K") {
             return [value.title, "한식"]
@@ -53,6 +63,34 @@ function Home() {
         }
         return [value.title, value.type]
     }, [])
+
+    function SearchRestaurant(search_text:string){
+
+        const request_url:string = import.meta.env.VITE_APP_KAKAO_API_URL
+        const parameter = {
+            query: search_text,
+            category_group_code:'FD6',
+            x:127.044246,
+            y:37.5106922,
+            radius:1000,
+            page:1,
+            page_size:10,
+            sort:'accuracy'
+        }
+        axios({
+            method:'get',
+            url:request_url,
+            headers:{'Authorization':`KakaoAK ${import.meta.env.VITE_APP_KAKAO_REST_API_KEY}`},
+            params:parameter
+        }).then((res)=>{
+            console.log(res.data)
+            console.log(res.data.documents)
+            setSearchResult(res.data.documents)
+            console.log(searchResults)
+        }).catch((e)=>{console.log(e)})
+
+    }
+
     const header = ["","이름", "종류"]
 
     return (
@@ -78,8 +116,8 @@ function Home() {
                 <div className="rounded-r-2xl w-[30%] h-[80%] bg-white p-10 relative">
                     <div className="form-control w-full">
                         <div className="input-group w-full">
-                            <input type="text" placeholder="Search…" className="input input-bordered w-full" />
-                            <button className="btn btn-square bg-orange-200 hover:bg-orange-300">
+                            <input name="search" type="text" placeholder="Search…" className="input input-bordered w-full" value={query} onChange={onChangeSearch}/>
+                            <button className="btn btn-square bg-orange-200 hover:bg-orange-300" onClick={(event)=>{SearchRestaurant(searchQuery)}} >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                             </button>
                         </div>
