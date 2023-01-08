@@ -13,3 +13,12 @@ declare interface Documents {
     distance:string
 }
 
+declare interface MapMarkerPosition {
+    content: JSX.Element
+    title: string
+    latlng: {
+        lat:number,
+        lng:number
+    }
+    type:string
+}

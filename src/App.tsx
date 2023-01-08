@@ -15,7 +15,7 @@ function App() {
     return (
         <RecoilRoot>
             <>
-                <main className="bg-[#fff0e0] h-screen">
+                <main className="bg-[#fff0e0] h-screen overflow-hidden">
                     {/*<button className="btn">메뉴</button>*/}
                     <div className="navbar bg-orange-200">
                         <a className="btn btn-ghost normal-case text-xl" href="/">Main</a>
