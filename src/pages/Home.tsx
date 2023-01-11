@@ -48,7 +48,8 @@ function Home() {
     const [searchTableVisible, setSearchTableVisible] = US<boolean>(false)
     const [searchTableData, setSearchTableData] = US<string[][]>([])
     const [mapMarkerList, setMapMarkerList] = US<MapMarkerPosition[]>(position)
-
+    const query = searchQuery
+    const searchData = searchTableData
     const onChangeSearch = (e: any) => {
         const {value, name} = e.target
         if (value.length === 0) {
@@ -60,18 +61,16 @@ function Home() {
         }
 
     }
-    const query = searchQuery
-    const searchData = searchTableData
+
 
     const data = mapMarkerList.map((item, idx) => {
         return [item.title, item.type]
     })
 
-    async function SearchRestaurant(search_text: string) {
-        setSearchResult([])
+    const searchRestaurant = async () => {
         const request_url: string = `${import.meta.env.VITE_APP_KAKAO_API_URL}/v2/local/search/keyword.json`
         const parameter = {
-            query: search_text,
+            query: query,
             category_group_code: 'FD6',
             x: 127.044246,
             y: 37.5106922,
@@ -80,18 +79,22 @@ function Home() {
             size: 10,
             sort: 'accuracy'
         }
-        axios({
-            method: 'get',
-            url: request_url,
-            headers: {'Authorization': `KakaoAK ${import.meta.env.VITE_APP_KAKAO_REST_API_KEY}`},
-            params: parameter
-        }).then((res) => {
-            setSearchResult([...res.data.documents])
-            console.log(searchResults)
+        try{
+            const response = await axios({
+                method: 'get',
+                url: request_url,
+                headers: {'Authorization': `KakaoAK ${import.meta.env.VITE_APP_KAKAO_REST_API_KEY}`},
+                params: parameter
+            })
+            const data:Documents[] = response.data.documents
+            setSearchResult((prev)=>{
+                const ls = [...data,...prev]
+                return ls
+            })
             const searchData = searchResults.map((item, idx) => {
                 let category_name: any = item.category_name
                 category_name = category_name.split(" > ")
-                let category = category_name[1]
+                let category:string = category_name[1]
                 return (
                     [category, item.place_name]
                 )
@@ -108,15 +111,14 @@ function Home() {
                     type: category_name
                 }
             })
-            setSearchTableData([...searchData])
-            console.log(searchData)
+            setSearchTableData((prev)=>{return [...searchData,...prev]})
             setSearchTableVisible(true)
-            setMapMarkerList([...mapMarker])
-
-        }).catch((e) => {
+            setMapMarkerList((prev)=>{return [...mapMarker,...prev]})
+        }
+        catch(e) {
             setSearchTableVisible(false)
             setMapMarkerList([...position])
-        })
+        }
 
     }
 
@@ -150,9 +152,7 @@ function Home() {
                                        onChange={onChangeSearch}/>
                                 <label htmlFor="search-result-modal"
                                        className="btn btn-square bg-orange-200 border-orange-400 hover:border-orange-500 hover:bg-orange-300"
-                                       onClick={(event) => {
-                                           SearchRestaurant(searchQuery)
-                                       }}>
+                                       onClick={searchRestaurant}>
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
                                          viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
