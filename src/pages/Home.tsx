@@ -68,6 +68,7 @@ function Home() {
     })
 
     const searchRestaurant = async () => {
+        searchResultArr.current = []
         const request_url: string = `${import.meta.env.VITE_APP_KAKAO_API_URL}/v2/local/search/keyword.json`
         const parameter = {
             query: query,
@@ -108,9 +109,9 @@ function Home() {
                     type: category_name
                 }
             })
-            setSearchTableData((prev)=>{return [...searchData,...prev]})
+            setSearchTableData([...searchData])
             setSearchTableVisible(true)
-            setMapMarkerList((prev)=>{return [...mapMarker,...prev]})
+            setMapMarkerList([...mapMarker])
         }
         catch(e) {
             setSearchTableVisible(false)
@@ -146,7 +147,11 @@ function Home() {
                             <div className="input-group w-full">
                                 <input name="search" type="text" placeholder="Search…"
                                        className="input input-bordered border-orange-100 w-full" value={query}
-                                       onChange={onChangeSearch}/>
+                                       onChange={onChangeSearch}
+                                       onKeyUp={(e)=>{if(e.key==='Enter'){
+                                           searchRestaurant()
+                                       }}}
+                                />
                                 <label htmlFor="search-result-modal"
                                        className="btn btn-square bg-orange-200 border-orange-400 hover:border-orange-500 hover:bg-orange-300"
                                        onClick={searchRestaurant}>
