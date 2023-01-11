@@ -1,4 +1,4 @@
-import React, {useEffect as UE, useState as US, useMemo as UM, FormEvent} from "react";
+import React, {useEffect as UE, useState as US, useMemo as UM, FormEvent, useRef as UR} from "react";
 import {MapMarker, Map, useMap} from "react-kakao-maps-sdk";
 import Table from "../components/Table";
 import axios from "axios";
@@ -43,7 +43,7 @@ const EventMarkerContainer = ({position, content}) => {
 
 
 function Home() {
-    const [searchResults, setSearchResult] = US<Documents[]>([])
+    const searchResultArr = UR<Documents[]>([])
     const [searchQuery, setSearchQuery] = US<string>('')
     const [searchTableVisible, setSearchTableVisible] = US<boolean>(false)
     const [searchTableData, setSearchTableData] = US<string[][]>([])
@@ -87,11 +87,8 @@ function Home() {
                 params: parameter
             })
             const data:Documents[] = response.data.documents
-            setSearchResult((prev)=>{
-                const ls = [...data,...prev]
-                return ls
-            })
-            const searchData = searchResults.map((item, idx) => {
+            searchResultArr.current = data
+            const searchData = searchResultArr.current.map((item, idx) => {
                 let category_name: any = item.category_name
                 category_name = category_name.split(" > ")
                 let category:string = category_name[1]
@@ -99,7 +96,7 @@ function Home() {
                     [category, item.place_name]
                 )
             })
-            const mapMarker = searchResults.map((item, idx) => {
+            const mapMarker = searchResultArr.current.map((item, idx) => {
                 let category_name: string = item.category_name.split(" > ")[1]
                 return {
                     content: <div className="bg-white"> {item.place_name} </div>,
@@ -168,10 +165,8 @@ function Home() {
                                 <Table header={header} data={data} tableClassName="mt-3"
                                        tableHeadClassName="bg-orange-200"/>
                         }
-
                     </div>
                 </div>
-
             </main>
         </>
     )
