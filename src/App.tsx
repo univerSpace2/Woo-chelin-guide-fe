@@ -17,7 +17,7 @@ function App() {
             <>
                 <main className="bg-[#fff0e0] h-screen overflow-hidden">
                     {/*<button className="btn">메뉴</button>*/}
-                    <div className="navbar bg-orange-200">
+                    <div className="navbar bg-orange-200 drop-shadow-md">
                         <a className="btn btn-ghost normal-case text-xl" href="/">Main</a>
                         <a className="btn btn-ghost normal-case text-xl" href="/login">Login</a>
                         <a className="btn btn-ghost normal-case text-xl" href="/signup">Signup</a>

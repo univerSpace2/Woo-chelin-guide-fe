@@ -1,12 +1,30 @@
 import React, {useEffect as UE, useState as US, useMemo as UM, FormEvent, useRef as UR} from "react";
-import {MapMarker, Map, useMap} from "react-kakao-maps-sdk";
+import {MapMarker, Map, useMap, CustomOverlayMap} from "react-kakao-maps-sdk";
 import Table from "../components/Table";
 import axios from "axios";
 import {Position} from "postcss";
 // home page route
 const position: MapMarkerPosition[] = [
     {
-        content: <div className="bg-white"> 수락정 </div>,
+        content:
+            <div className="relative bottom-[22rem] card w-96 bg-base-100 shadow-xl">
+                <figure><img src="https://picsum.photos/seed/수락정/400/225" alt="Shoes"/></figure>
+                <div className="card-body">
+                    <h2 className="card-title">
+                        수락정
+                        <div className="badge badge-secondary">인기</div>
+                    </h2>
+                    <p>김치찌개와 제육볶음이 맛있는 집</p>
+                    <div className="card-actions justify-end">
+                        <div className="badge badge-outline">한식</div>
+                        <div className="badge badge-outline">점심</div>
+                    </div>
+                    <div className="card-actions justify-end">
+                        <button className="btn btn-primary">자세히 보기</button>
+                    </div>
+                </div>
+            </div>
+        ,
         title: "수락정",
         latlng: {lat: 37.51165526340373, lng: 127.0435756804201},
         type: "한식"
@@ -29,15 +47,24 @@ const EventMarkerContainer = ({position, content}) => {
     const map = useMap()
     const [isVisible, setIsVisible] = US(false)
     return (
-        <MapMarker
-            position={position} // 마커를 표시할 위치
-            // @ts-ignore
-            onClick={(marker) => map.panTo(marker.getPosition())}
-            onMouseOver={() => setIsVisible(true)}
-            onMouseOut={() => setIsVisible(false)}
-        >
-            {isVisible && content}
-        </MapMarker>
+        <>
+            <MapMarker
+                position={position} // 마커를 표시할 위치
+                // @ts-ignore
+                onClick={(marker) => {
+                    map.panTo(marker.getPosition())
+                    if(isVisible){
+                        setIsVisible(false)
+                    }
+                    else{
+                        setIsVisible(true)
+                    }
+                }}
+            />
+            {isVisible  && (<CustomOverlayMap position={position}>
+                {content}
+            </CustomOverlayMap>)}
+        </>
     )
 }
 
