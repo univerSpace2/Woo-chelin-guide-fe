@@ -2,19 +2,16 @@ import React, {MouseEventHandler} from "react";
 import {useState as US} from "react";
 import {searchForWorkspaceRoot} from "vite";
 
-interface MapCardProps {
+interface SearchCardProps {
     cardTitle:string;
-    cardDescription:string;
     cardDescTag?:string[];
-    cardHot?:boolean;
     cardImgURL:string;
     cardOnClick:MouseEventHandler;
 }
 
 
 
-const MapCard: React.FC<MapCardProps> = ({cardTitle, cardDescription, cardDescTag,
-                                             cardHot,
+const SearchCard: React.FC<SearchCardProps> = ({cardTitle, cardDescription, cardDescTag,
                                              cardImgURL,cardOnClick}) =>{
 
     return (
@@ -31,9 +28,7 @@ const MapCard: React.FC<MapCardProps> = ({cardTitle, cardDescription, cardDescTa
                 <div className="card-body">
                     <h2 className="card-title">
                         {cardTitle}
-                        {cardHot ? <div className="badge badge-secondary">인기</div> : <></>}
                     </h2>
-                    <p>{cardDescription}</p>
                     <div className="card-actions justify-end">
                         {cardDescTag?.map((item)=>{
                             return (
@@ -53,4 +48,4 @@ const MapCard: React.FC<MapCardProps> = ({cardTitle, cardDescription, cardDescTa
     )
 }
 
-export default MapCard;
+export default SearchCard;

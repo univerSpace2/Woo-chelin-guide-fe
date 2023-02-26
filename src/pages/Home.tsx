@@ -3,41 +3,40 @@ import {MapMarker, Map, useMap, CustomOverlayMap} from "react-kakao-maps-sdk";
 import Table from "../components/Table";
 import axios from "axios";
 import {Position} from "postcss";
+import MapCard from "../components/MapCard";
+import SearchCard from "../components/SearchCard";
 // home page route
 const position: MapMarkerPosition[] = [
     {
-        content:
-            <div className="relative bottom-[22rem] card w-96 bg-base-100 shadow-xl">
-                <figure><img src="https://picsum.photos/seed/수락정/400/225" alt="Shoes"/></figure>
-                <div className="card-body">
-                    <h2 className="card-title">
-                        수락정
-                        <div className="badge badge-secondary">인기</div>
-                    </h2>
-                    <p>김치찌개와 제육볶음이 맛있는 집</p>
-                    <div className="card-actions justify-end">
-                        <div className="badge badge-outline">한식</div>
-                        <div className="badge badge-outline">점심</div>
-                    </div>
-                    <div className="card-actions justify-end">
-                        <button className="btn btn-primary">자세히 보기</button>
-                    </div>
-                </div>
-            </div>
-        ,
-        title: "수락정",
+        content:{
+            cardTitle:"수락정",
+            cardDescription:"분식이 다양한 맛집",
+            cardDescTag:["한식","점심"],
+            cardHot:true,
+            cardImgURL:"https://picsum.photos/seed/수락정/400/225"
+        },
         latlng: {lat: 37.51165526340373, lng: 127.0435756804201},
         type: "한식"
     },
     {
-        content: <div className="bg-white"> 행복한 김치찌개 </div>,
-        title: "행복한 김치찌개",
+        content: {
+            cardTitle:"행복한 김치찌개",
+            cardDescription:"김치찌개와 제육볶음이 맛있는 집",
+            cardDescTag:["한식","점심"],
+            cardHot:false,
+            cardImgURL:"https://picsum.photos/seed/행복한김치찌개/400/225"
+        },
         latlng: {lat: 37.511094601359964, lng: 127.04421440535162},
         type: "한식"
     },
     {
-        content: <div className="bg-white"> 바나프레소 선정릉점 </div>,
-        title: "바나프레소 선정릉점",
+        content:  {
+            cardTitle:"바나프레소 선정릉점",
+            cardDescription:"저렴하고 양 많은 카페",
+            cardDescTag:["카페",],
+            cardHot:true,
+            cardImgURL:"https://picsum.photos/seed/바나프레소/400/225"
+        },
         latlng: {lat: 37.5098946986603, lng: 127.0435814432},
         type: "카페"
     },
@@ -46,6 +45,9 @@ const position: MapMarkerPosition[] = [
 const EventMarkerContainer = ({position, content}) => {
     const map = useMap()
     const [isVisible, setIsVisible] = US(false)
+    const onClick = () => {
+        setIsVisible(false)
+    }
     return (
         <>
             <MapMarker
@@ -61,9 +63,16 @@ const EventMarkerContainer = ({position, content}) => {
                     }
                 }}
             />
-            {isVisible  && (<CustomOverlayMap position={position}>
-                {content}
-            </CustomOverlayMap>)}
+            <CustomOverlayMap position={position}>
+                {isVisible && (<MapCard
+                    cardTitle={content.cardTitle}
+                    cardDescription={content.cardDescription}
+                    cardImgURL={content.cardImgURL}
+                    cardHot={content.cardHot}
+                    cardDescTag={content.cardDescTag}
+                    cardOnClick={onClick}
+                />)}
+            </CustomOverlayMap>
         </>
     )
 }
@@ -91,7 +100,7 @@ function Home() {
 
 
     const data = mapMarkerList.map((item, idx) => {
-        return [item.title, item.type]
+        return [item.content.cardTitle, item.type]
     })
 
     const searchRestaurant = async () => {
@@ -127,8 +136,11 @@ function Home() {
             const mapMarker = searchResultArr.current.map((item, idx) => {
                 let category_name: string = item.category_name.split(" > ")[1]
                 return {
-                    content: <div className="bg-white"> {item.place_name} </div>,
-                    title: item.place_name,
+                    content: {
+                        cardTitle:item.place_name,
+                        cardDescTag: item.category_name.split((">")),
+                        cardImgURL:`https://picsum.photos/seed/${item.id}/400/225`
+                    },
                     latlng: {
                         lat: parseFloat(item.y),
                         lng: parseFloat(item.x)

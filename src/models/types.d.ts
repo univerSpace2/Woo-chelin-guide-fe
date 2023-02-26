@@ -14,11 +14,10 @@ declare interface Documents {
 }
 
 declare interface MapMarkerPosition {
-    content: JSX.Element
-    title: string
+    content: MapCardProps
     latlng: {
         lat:number,
         lng:number
     }
-    type:string
+    type: string
 }
