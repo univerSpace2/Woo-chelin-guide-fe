@@ -21,3 +21,27 @@ declare interface MapMarkerPosition {
     }
     type: string
 }
+interface commonResponse {
+    message:string;
+    result:any;
+    status:boolean;
+    status_code:number;
+}
+interface ListResponse extends commonResponse<T>{
+    result: T[];
+}
+interface ObjectResponse extends commonResponse<T>{
+    result: T;
+}
+interface StringResponse extends commonResponse {
+    result: string;
+}
+interface NumberResponse extends commonResponse {
+    result: number;
+}
+interface NullResponse extends commonResponse{
+    result: null;
+}
+interface BoolResponse extends commonResponse{
+    result:boolean;
+}

@@ -20,7 +20,7 @@ const MapCard: React.FC<MapCardProps> = ({cardTitle, cardDescription, cardDescTa
     return (
 
         <>
-            <div className="card right-48 bottom-48 w-96 bg-base-100 shadow-xl z-50">
+            <div className="card right-48 bottom-48 w-96 bg-base-100 shadow-xl z-1000">
                 <figure><img src="https://picsum.photos/seed/수락정/400/225" alt="Shoes"/></figure>
                 <button className="absolute right-3 top-3 btn btn-square btn-sm bg-orange-300 border-orange-300 hover:bg-orange-400
                 hover:border-orange-400" onClick={cardOnClick}>
