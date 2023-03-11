@@ -3,7 +3,7 @@ interface Profile{
     name:string
     eng_name:string
     phone?:string
-    user_id:number
+    user_id?:number
     anonymous_name:string
 }
 
@@ -27,24 +27,33 @@ interface ChangePasswordRequest{
     password_two:string
 }
 
-interface getAccountInfoResponse extends ObjectResponse{
+interface getAccountInfoResponse extends ObjectResponse<Account>{
     result: Account;
 }
 
-interface getAccountListResponse extends ListResponse{
+interface getAccountListResponse extends ListResponse<Account[]>{
     result: Account[];
 }
 
-interface getRandNameResponse extends StringResponse {}
+interface getRandNameResponse extends ObjectResponse<{anonymous_name:string}>{
+    result:{anonymous_name:string}
+}
 
-interface getChangePasswordResponse extends ObjectResponse<{msg:string}>{}
+interface getChangePasswordResponse extends ObjectResponse<{msg:string}>{
+    result:{msg:string}
+}
 
-interface LoginResponse extends ObejectResponse<{
+interface LoginResponse extends ObjectResponse<{
     access_token: string
     refresh_token: string
     user: Account
-}>{}
-
+}> {
+    result: {
+        access_token: string
+        refresh_token: string
+        user: Account
+    }
+}
 
 
 
