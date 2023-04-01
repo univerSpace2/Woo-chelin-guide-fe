@@ -24,20 +24,27 @@ function Signup() {
     const [confirmEmail,setConfirmEmail] = useState(false)
     const [confirmPassword,setConfirmPassword] = useState(false)
     const [confirmPasswordSame,setConfirmPasswordSame] = useState(false)
-    const validatePassword = (password:string): boolean => {
-        const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{10,}$/;
-        return regex.test(password);
-    }
-    const validateEmail = (email:string): boolean =>{
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return regex.test(email);
-    }
-    const validatePasswordSame = (password2:string) => {
-        return accountForm.password === password2
-    }
-
+    const [confirmEngName,setConfirmEngName] = useState(false)
     const [passwordAgain, setPasswordAgain] = useState('')
     const [showAlert, setShowAlert] = useState(false)
+
+    useEffect(()=>{
+        const engNameRegex = /^[A-Za-z]+$/;
+        setConfirmEngName(engNameRegex.test(profileForm.eng_name))
+    },[profileForm.eng_name])
+    useEffect(()=>{
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{10,}$/;
+        setConfirmEngName(passwordRegex.test(accountForm.password))
+    },[accountForm.password])
+    useEffect(()=>{
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        setConfirmEngName(emailRegex.test(accountForm.email))
+    },[accountForm.email])
+
+    useEffect(()=>{
+        setConfirmPasswordSame(accountForm.password===passwordAgain)
+    },[passwordAgain])
+
 
     const onClickAnonymousName = async () =>{
         const res = await API.account.getRandName()
@@ -71,7 +78,7 @@ function Signup() {
                                             onChange={(e)=>{
                                                 setProfileForm({...profileForm,name:e.target.value})
                                             }}
-                                            className="input input-sm mt-1 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                                            className={`input input-sm mt-1 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm`}
                                         />
                                     </div>
 
@@ -89,7 +96,7 @@ function Signup() {
                                             onChange={(e)=>{
                                                 setProfileForm({...profileForm,eng_name:e.target.value})
                                             }}
-                                            className="input input-sm mt-1 block w-full  border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                                            className={`input input-sm mt-1 block w-full  border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm`}
                                         />
                                     </div>
 
@@ -106,9 +113,8 @@ function Signup() {
                                             value={accountForm.email}
                                             onChange={(e)=>{
                                                 setAccountForm({...accountForm,email:e.target.value})
-                                                setConfirmEmail(validateEmail(e.target.value))
                                             }}
-                                            className="input input-sm mt-1 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                                            className={`input input-sm mt-1 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm`}
                                         />
                                     </div>
 
@@ -121,7 +127,7 @@ function Signup() {
                                             id="team"
                                             name="team"
                                             autoComplete="team-name"
-                                            className="input mt-1 block w-full  border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 sm:text-sm"
+                                            className="input input-sm mt-1 block w-full  border border-gray-300 bg-white py-1 px-3 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 sm:text-sm"
                                         >
                                             <option>AI기술연구소</option>
                                             <option>컨설팅본부</option>
@@ -166,7 +172,6 @@ function Signup() {
                                             value={accountForm.password}
                                             onChange={(e)=>{
                                                 setAccountForm({...accountForm,password:e.target.value})
-                                                setConfirmPassword(validatePassword(e.target.value))
                                             }}
                                             className="input input-sm mt-1 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
                                         />
@@ -185,7 +190,6 @@ function Signup() {
                                             value={passwordAgain}
                                             onChange={(e)=>{
                                                 setPasswordAgain(e.target.value)
-                                                setConfirmPasswordSame(validatePasswordSame(e.target.value))
                                             }}
                                             className="input input-sm mt-1 block w-full  border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
                                         />
