@@ -5,54 +5,75 @@ import account from "../api/account";
 import Alert from "../components/Alert";
 
 function Signup() {
-    const [accountForm,setAccountForm] = useState<Account>({
-        email:'',
-        password:'',
-        profile:{
-            name:'',
-            eng_name:'',
-            phone:'',
-            anonymous_name:''
+    const [accountForm, setAccountForm] = useState<Account>({
+        email: '',
+        password: '',
+        profile: {
+            name: '',
+            eng_name: '',
+            phone: '',
+            anonymous_name: ''
         }
     })
-    const [profileForm,setProfileForm] = useState<Profile>({
-        name:'',
-        eng_name:'',
-        phone:'',
-        anonymous_name:''
+    const [profileForm, setProfileForm] = useState<Profile>({
+        name: '',
+        eng_name: '',
+        phone: '',
+        anonymous_name: ''
     })
-    const [confirmEmail,setConfirmEmail] = useState(false)
-    const [confirmPassword,setConfirmPassword] = useState(false)
-    const [confirmPasswordSame,setConfirmPasswordSame] = useState(false)
-    const [confirmEngName,setConfirmEngName] = useState(false)
+    const [inputTouched, setInputTouched] = useState<{
+        email: boolean
+        password: boolean
+        name: boolean
+        eng_name: boolean
+        phone: boolean
+        passwordAgain: boolean
+    }>({
+        email: false,
+        password: false,
+        name: false,
+        eng_name: false,
+        phone: false,
+        passwordAgain: false
+    })
+
+    const [confirmEmail, setConfirmEmail] = useState(false)
+    const [confirmPhoneNumber, setConfirmPhoneNumber] = useState(false)
+
+    const [confirmPassword, setConfirmPassword] = useState(false)
+    const [confirmPasswordSame, setConfirmPasswordSame] = useState(false)
+    const [confirmEngName, setConfirmEngName] = useState(false)
     const [passwordAgain, setPasswordAgain] = useState('')
     const [showAlert, setShowAlert] = useState(false)
 
-    useEffect(()=>{
+    useEffect(() => {
         const engNameRegex = /^[A-Za-z]+$/;
         setConfirmEngName(engNameRegex.test(profileForm.eng_name))
-    },[profileForm.eng_name])
-    useEffect(()=>{
+    }, [profileForm.eng_name])
+    useEffect(() => {
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{10,}$/;
-        setConfirmEngName(passwordRegex.test(accountForm.password))
-    },[accountForm.password])
-    useEffect(()=>{
+        setConfirmPassword(passwordRegex.test(accountForm.password))
+    }, [accountForm.password])
+    useEffect(() => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        setConfirmEngName(emailRegex.test(accountForm.email))
-    },[accountForm.email])
+        setConfirmEmail(emailRegex.test(accountForm.email))
+    }, [accountForm.email])
 
-    useEffect(()=>{
-        setConfirmPasswordSame(accountForm.password===passwordAgain)
-    },[passwordAgain])
+    useEffect(() => {
+        setConfirmPasswordSame(accountForm.password === passwordAgain)
+    }, [passwordAgain])
+    useEffect(() => {
+        const phoneRegex = /^010\d{8}$/;
+        setConfirmPhoneNumber(phoneRegex.test(profileForm.phone || ''));
+    }, [profileForm.phone]);
 
 
-    const onClickAnonymousName = async () =>{
+    const onClickAnonymousName = async () => {
         const res = await API.account.getRandName()
-        if(res.status_code===200){
-            setProfileForm({...profileForm,anonymous_name:res.result.anonymous_name})
-        }
-        else{
-            setProfileForm({...profileForm,anonymous_name:''})
+        if (res.status_code === 200) {
+            setProfileForm({...profileForm, anonymous_name: res.result.anonymous_name})
+        } else {
+            setProfileForm({...profileForm, anonymous_name: ''})
         }
     }
 
@@ -66,7 +87,7 @@ function Signup() {
                                 <div className="grid grid-cols-6 gap-6">
                                     <div className="col-span-3 sm:col-span-3">
                                         <label htmlFor="name"
-                                               className="block text-sm font-medium text-gray-700">
+                                               className="block text-md font-bold text-gray-700">
                                             이름
                                         </label>
                                         <input
@@ -75,17 +96,21 @@ function Signup() {
                                             id="name"
                                             autoComplete="name"
                                             value={profileForm.name}
-                                            onChange={(e)=>{
-                                                setProfileForm({...profileForm,name:e.target.value})
+                                            onChange={(e) => {
+                                                setProfileForm({...profileForm, name: e.target.value})
                                             }}
-                                            className={`input input-sm mt-1 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm`}
+                                            onBlur={() => {
+                                                setInputTouched({...inputTouched, name: true})
+                                            }}
+                                            placeholder="성함을 입력해주세요"
+                                            className={`input input-sm mt-2 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm `}
                                         />
                                     </div>
 
                                     <div className="col-span-3 sm:col-span-3">
                                         <label htmlFor="eng-name"
-                                               className="block text-sm font-medium text-gray-700">
-                                            영어이름
+                                               className="block text-md font-bold  text-gray-700">
+                                            영어 이름*
                                         </label>
                                         <input
                                             type="text"
@@ -93,17 +118,30 @@ function Signup() {
                                             id="eng-name"
                                             autoComplete="eng-name"
                                             value={profileForm.eng_name}
-                                            onChange={(e)=>{
-                                                setProfileForm({...profileForm,eng_name:e.target.value})
+                                            onChange={(e) => {
+                                                setProfileForm({...profileForm, eng_name: e.target.value})
                                             }}
-                                            className={`input input-sm mt-1 block w-full  border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm`}
+                                            onBlur={() => {
+                                                setInputTouched({
+                                                    ...inputTouched,
+                                                    eng_name: profileForm.eng_name === '' ? false : true
+                                                })
+                                            }}
+                                            placeholder="영어 닉네임을 입력해주세요. ex) Jay, Wynn..."
+                                            className={`input input-sm mt-2 block w-full  shadow-sm focus:ring-orange-500 sm:text-sm
+                                            ${confirmEngName || !inputTouched.eng_name ? 'border-gray-300 focus:border-orange-500 focus:ring-orange-500' : 'border-red-600 focus:border-red-700 focus:ring-red-500'}
+                                            `}
                                         />
+                                        <div
+                                            className={`text-xs mt-1 pl-2 text-red-600 ${confirmEngName || !inputTouched.eng_name ? 'hidden' : ''}`}>
+                                            영어로 입력해주세요.
+                                        </div>
                                     </div>
 
-                                    <div className="col-span-6 sm:col-span-4">
+                                    <div className="col-span-3 sm:col-span-3">
                                         <label htmlFor="email-address"
-                                               className="block text-sm font-medium text-gray-700">
-                                            Email 주소
+                                               className="block text-md font-bold text-gray-700">
+                                            Email 주소*
                                         </label>
                                         <input
                                             type="text"
@@ -111,33 +149,58 @@ function Signup() {
                                             id="email-address"
                                             autoComplete="email"
                                             value={accountForm.email}
-                                            onChange={(e)=>{
-                                                setAccountForm({...accountForm,email:e.target.value})
+                                            placeholder="회사 이메일 주소를 입력해주세요. ex) jay@datamarketing.co.kr"
+                                            onChange={(e) => {
+                                                setAccountForm({...accountForm, email: e.target.value})
                                             }}
-                                            className={`input input-sm mt-1 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm`}
+                                            onBlur={() => {
+                                                setInputTouched({
+                                                    ...inputTouched,
+                                                    email: accountForm.email === '' ? false : true
+                                                })
+                                            }}
+                                            className={`input input-sm mt-2 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm
+                                            ${confirmEmail || !inputTouched.email ? 'border-gray-300 focus:border-orange-500 focus:ring-orange-500' : 'border-red-600 focus:border-red-700 focus:ring-red-500'}
+                                            `}
                                         />
+                                        <div
+                                            className={`text-xs mt-1 pl-2 text-red-600 ${confirmEmail || !inputTouched.email ? 'hidden' : ''}`}>
+                                            이메일 형식으로 입력해주세요.
+                                        </div>
                                     </div>
-
-                                    <div className="col-span-2">
-                                        <label htmlFor="team"
-                                               className="block text-sm font-medium text-gray-700">
-                                            소속 본부
+                                    <div className="col-span-3 sm:col-span-3">
+                                        <label htmlFor="email-address"
+                                               className="block text-md font-bold text-gray-700">
+                                            핸드폰 번호
                                         </label>
-                                        <select
-                                            id="team"
-                                            name="team"
-                                            autoComplete="team-name"
-                                            className="input input-sm mt-1 block w-full  border border-gray-300 bg-white py-1 px-3 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 sm:text-sm"
-                                        >
-                                            <option>AI기술연구소</option>
-                                            <option>컨설팅본부</option>
-                                            <option>경영관리본부</option>
-                                            <option>교육본부</option>
-                                        </select>
+                                        <input
+                                            type="text"
+                                            name="email-address"
+                                            id="email-address"
+                                            autoComplete="email"
+                                            value={profileForm.phone}
+                                            placeholder="'-'를 제외하고 입력해주세요"
+                                            onChange={(e) => {
+                                                setProfileForm({...profileForm, phone: e.target.value})
+                                            }}
+                                            onBlur={() => {
+                                                setInputTouched({
+                                                    ...inputTouched,
+                                                    phone: profileForm.phone === '' ? false : true
+                                                })
+                                            }}
+                                            className={`input input-sm mt-2 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm
+                                            ${confirmPhoneNumber || !inputTouched.phone ? 'border-gray-300 focus:border-orange-500 focus:ring-orange-500' : 'border-red-600 focus:border-red-700 focus:ring-red-500'}
+                                            `}
+                                        />
+                                        <div
+                                            className={`text-xs mt-1 pl-2 text-red-600 ${confirmPhoneNumber || !inputTouched.phone ? 'hidden' : ''}`}>
+                                            핸드폰 번호 양식이 아닙니다.
+                                        </div>
                                     </div>
 
                                     <div className="col-span-6 sm:col-span-3 lg:col-span-3">
-                                        <label htmlFor="anonymous" className="block text-sm font-medium text-gray-700">
+                                        <label htmlFor="anonymous" className="block text-md font-bold text-gray-700">
                                             익명 이름
                                         </label>
                                         <div className="input-group">
@@ -148,21 +211,22 @@ function Signup() {
                                                 autoComplete="address-level2"
                                                 value={profileForm.anonymous_name}
                                                 disabled={true}
-                                                className="disabled:border-gray-300 input input-sm mt-1 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                                                className="disabled:border-gray-300 input input-sm mt-2 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
                                             />
-                                            <button className="btn mt-1 btn-sm inline-flex justify-center border border-transparent bg-orange-600 px-4 text-sm font-small text-white shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2" 
-                                                    type="button"
-                                                    onClick={onClickAnonymousName}
+                                            <button
+                                                className="btn mt-2 btn-sm inline-flex justify-center border border-transparent bg-orange-600 px-4 text-sm font-small text-white shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                                type="button"
+                                                onClick={onClickAnonymousName}
                                             >
-                                                {profileForm.anonymous_name === '' ? "이름 생성": "다른 이름..."}
+                                                {profileForm.anonymous_name === '' ? "이름 생성" : "다른 이름..."}
                                             </button>
                                         </div>
                                     </div>
                                     <div className="col-span-3 sm:col-span-3"/>
                                     <div className="col-span-3 sm:col-span-3">
                                         <label htmlFor="password"
-                                               className="block text-sm font-medium text-gray-700">
-                                            비밀번호
+                                               className="block text-md font-bold  text-gray-700">
+                                            비밀번호*
                                         </label>
                                         <input
                                             type="password"
@@ -170,17 +234,30 @@ function Signup() {
                                             id="password"
                                             autoComplete="password"
                                             value={accountForm.password}
-                                            onChange={(e)=>{
-                                                setAccountForm({...accountForm,password:e.target.value})
+                                            placeholder="영문+숫자+특수문자 조합으로 10자 이상 입력해주세요."
+                                            onChange={(e) => {
+                                                setAccountForm({...accountForm, password: e.target.value})
                                             }}
-                                            className="input input-sm mt-1 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                                            onBlur={() => {
+                                                setInputTouched({
+                                                    ...inputTouched,
+                                                    password: accountForm.password === '' ? false : true
+                                                })
+                                            }}
+                                            className={`input input-sm mt-2 block w-full border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm
+                                            ${confirmPassword || !inputTouched.password ? 'border-gray-300 focus:border-orange-500 focus:ring-orange-500' : 'border-red-600 focus:border-red-700 focus:ring-red-500'}
+                                            `}
                                         />
+                                        <div
+                                            className={`text-xs mt-1 pl-2 text-red-600 ${confirmPassword || !inputTouched.password ? 'hidden' : ''}`}>
+                                            <p>비밀번호 형식이 알맞지 않습니다.</p>영문+숫자+특수문자 조합으로 10자 이상 입력해주세요.
+                                        </div>
                                     </div>
 
                                     <div className="col-span-3 sm:col-span-3">
                                         <label htmlFor="password-again"
-                                               className="block text-sm font-medium text-gray-700">
-                                            비밀번호 확인
+                                               className="block text-md font-bold  text-gray-700">
+                                            비밀번호 확인*
                                         </label>
                                         <input
                                             type="password"
@@ -188,11 +265,24 @@ function Signup() {
                                             id="password-again"
                                             autoComplete="password-again"
                                             value={passwordAgain}
-                                            onChange={(e)=>{
+                                            placeholder="입력한 비밀번호와 동일하게 입력해주세요."
+                                            onChange={(e) => {
                                                 setPasswordAgain(e.target.value)
                                             }}
-                                            className="input input-sm mt-1 block w-full  border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm"
+                                            onBlur={() => {
+                                                setInputTouched({
+                                                    ...inputTouched,
+                                                    passwordAgain: passwordAgain === '' ? false : true
+                                                })
+                                            }}
+                                            className={`input input-sm mt-2 block w-full  border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm
+                                            ${confirmPasswordSame || !inputTouched.passwordAgain ? 'border-gray-300 focus:border-orange-500 focus:ring-orange-500' : 'border-red-600 focus:border-red-700 focus:ring-red-500'}
+                                            `}
                                         />
+                                        <div
+                                            className={`text-xs mt-1 pl-2 text-red-600 ${confirmPasswordSame || !inputTouched.passwordAgain ? 'hidden' : ''}`}>
+                                            입력한 비밀번호와 일치하지 않습니다.
+                                        </div>
                                     </div>
 
                                 </div>
@@ -208,7 +298,9 @@ function Signup() {
                                 <button
                                     type="button"
                                     className="btn inline-flex justify-center border border-transparent bg-orange-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-                                    onClick={()=>{setShowAlert(true)}}
+                                    onClick={() => {
+                                        setShowAlert(true)
+                                    }}
                                     // onClick={()=>{window.location.href = "/login"}}
                                 >
                                     회원가입하기
@@ -218,9 +310,10 @@ function Signup() {
                     </form>
                 </div>
             </div>
-            <Alert message={"로그인을 진행하시겠습니까?"} onConfirm={()=>{
-                setAccountForm({...accountForm,profile:profileForm})
-                setShowAlert(false)}} show={showAlert}/>
+            <Alert message={"로그인을 진행하시겠습니까?"} onConfirm={() => {
+                setAccountForm({...accountForm, profile: profileForm})
+                setShowAlert(false)
+            }} show={showAlert}/>
         </>
     )
 }
