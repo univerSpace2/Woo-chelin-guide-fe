@@ -201,7 +201,7 @@ function Signup() {
 
                                     <div className="col-span-6 sm:col-span-3 lg:col-span-3">
                                         <label htmlFor="anonymous" className="block text-md font-bold text-gray-700">
-                                            익명 이름
+                                            익명 이름*
                                         </label>
                                         <div className="input-group">
                                             <input
@@ -297,10 +297,15 @@ function Signup() {
                                 </button>
                                 <button
                                     type="button"
-                                    className="btn inline-flex justify-center border border-transparent bg-orange-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                    className="btn inline-flex justify-center border border-transparent bg-orange-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-orange-700
+                                    focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2
+                                    "
                                     onClick={() => {
                                         setShowAlert(true)
                                     }}
+                                    disabled={
+                                        !(confirmEngName&&confirmEmail&&confirmPassword&&confirmPasswordSame&&profileForm.anonymous_name!=='')
+                                    }
                                     // onClick={()=>{window.location.href = "/login"}}
                                 >
                                     회원가입하기
