@@ -1,44 +1,46 @@
-import React, {useEffect as UE, useState as US, useMemo as UM, FormEvent, useRef as UR} from "react";
+import React, {useEffect as UE, useState as US, useMemo as UM, FormEvent, useRef as UR, useEffect} from "react";
 import {MapMarker, Map, useMap, CustomOverlayMap} from "react-kakao-maps-sdk";
 import Table from "../components/Table";
 import axios from "axios";
 import {Position} from "postcss";
 import MapCard from "../components/MapCard";
 import SearchCard from "../components/SearchCard";
+import secureLocalStorage from "react-secure-storage";
+import {useNavigate} from "react-router-dom";
 // home page route
 const position: MapMarkerPosition[] = [
     {
         content:{
-            cardTitle:"수락정",
-            cardDescription:"분식이 다양한 맛집",
-            cardDescTag:["한식","점심"],
+            cardTitle:"",
+            cardDescription:"",
+            cardDescTag:["",""],
             cardHot:true,
             cardImgURL:"https://picsum.photos/seed/수락정/400/225"
         },
-        latlng: {lat: 37.51165526340373, lng: 127.0435756804201},
-        type: "한식"
+        latlng: {lat: 0, lng: 0},
+        type: ""
     },
     {
         content: {
-            cardTitle:"행복한 김치찌개",
-            cardDescription:"김치찌개와 제육볶음이 맛있는 집",
-            cardDescTag:["한식","점심"],
+            cardTitle:"",
+            cardDescription:"",
+            cardDescTag:["",""],
             cardHot:false,
             cardImgURL:"https://picsum.photos/seed/행복한김치찌개/400/225"
         },
-        latlng: {lat: 37.511094601359964, lng: 127.04421440535162},
-        type: "한식"
+        latlng: {lat: 0, lng: 0},
+        type: ""
     },
     {
         content:  {
-            cardTitle:"바나프레소 선정릉점",
-            cardDescription:"저렴하고 양 많은 카페",
-            cardDescTag:["카페",],
+            cardTitle:"",
+            cardDescription:"",
+            cardDescTag:["",],
             cardHot:true,
             cardImgURL:"https://picsum.photos/seed/바나프레소/400/225"
         },
-        latlng: {lat: 37.5098946986603, lng: 127.0435814432},
-        type: "카페"
+        latlng: {lat: 0, lng: 0},
+        type: ""
     },
 ]
 // @ts-ignore
@@ -78,7 +80,9 @@ const EventMarkerContainer = ({position, content}) => {
 }
 
 
-function Home() {
+function WoochelinMap() {
+    const navigate = useNavigate()
+
     const searchResultArr = UR<Documents[]>([])
     const [searchQuery, setSearchQuery] = US<string>('')
     const [searchTableVisible, setSearchTableVisible] = US<boolean>(false)
@@ -86,6 +90,7 @@ function Home() {
     const [mapMarkerList, setMapMarkerList] = US<MapMarkerPosition[]>(position)
     const query = searchQuery
     const searchData = searchTableData
+
     const onChangeSearch = (e: any) => {
         const {value, name} = e.target
         if (value.length === 0) {
@@ -161,12 +166,19 @@ function Home() {
 
     const header = ["", "이름", "카테고리"]
 
+    useEffect(() => {
+        const access_token = secureLocalStorage.getItem('access_token')
+        if (access_token === null) {
+            navigate('/')
+        }
+    }, []);
+
     return (
         <>
             <main className="pt-20 px-10 h-screen">
                 <div className="mx-auto w-full h-screen flex">
                     <Map
-                        center={{lat: 37.5106922, lng: 127.044246}}
+                        center={{lat: 37.492870, lng: 127.039152}}
                         level={1}
                         maxLevel={5}
                         minLevel={1}
@@ -216,4 +228,4 @@ function Home() {
     )
 }
 
-export default Home
+export default WoochelinMap

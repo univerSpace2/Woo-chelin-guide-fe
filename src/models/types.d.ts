@@ -21,28 +21,3 @@ declare interface MapMarkerPosition {
     }
     type: string
 }
-interface commonResponse<T> {
-    message:string;
-    result:T;
-    status:boolean;
-    status_code:number;
-}
-interface ListResponse<T> extends commonResponse<T[]>{
-    result: T[];
-}
-interface ObjectResponse<T> extends commonResponse<T>{
-    result: T;
-}
-interface StringResponse extends commonResponse<string> {
-    result: string;
-}
-interface NumberResponse extends commonResponse<number> {
-    result: number;
-}
-interface NullResponse extends commonResponse<null>{
-    result: null;
-}
-interface BoolResponse extends commonResponse<boolean>{
-    result:boolean;
-}
-const a:ListResponse

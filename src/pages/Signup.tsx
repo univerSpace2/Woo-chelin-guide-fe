@@ -1,23 +1,23 @@
-import React from "react";
 import {useState, useEffect} from "react";
 import API from "../api/main";
 import account from "../api/account";
 import Alert from "../components/Alert";
+import {useNavigate} from "react-router-dom";
 
 function Signup() {
+    const navigate = useNavigate()
+
     const [accountForm, setAccountForm] = useState<Account>({
         email: '',
         password: '',
         profile: {
             name: '',
-            eng_name: '',
             phone: '',
             anonymous_name: ''
         }
     })
     const [profileForm, setProfileForm] = useState<Profile>({
         name: '',
-        eng_name: '',
         phone: '',
         anonymous_name: ''
     })
@@ -25,14 +25,12 @@ function Signup() {
         email: boolean
         password: boolean
         name: boolean
-        eng_name: boolean
         phone: boolean
         passwordAgain: boolean
     }>({
         email: false,
         password: false,
         name: false,
-        eng_name: false,
         phone: false,
         passwordAgain: false
     })
@@ -42,14 +40,10 @@ function Signup() {
 
     const [confirmPassword, setConfirmPassword] = useState(false)
     const [confirmPasswordSame, setConfirmPasswordSame] = useState(false)
-    const [confirmEngName, setConfirmEngName] = useState(false)
     const [passwordAgain, setPasswordAgain] = useState('')
-    const [showAlert, setShowAlert] = useState(false)
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false)
+    const [showFailedAlert, setShowFailedAlert] = useState(false)
 
-    useEffect(() => {
-        const engNameRegex = /^[A-Za-z]+$/;
-        setConfirmEngName(engNameRegex.test(profileForm.eng_name))
-    }, [profileForm.eng_name])
     useEffect(() => {
         const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{10,}$/;
         setConfirmPassword(passwordRegex.test(accountForm.password))
@@ -66,14 +60,29 @@ function Signup() {
         const phoneRegex = /^010\d{8}$/;
         setConfirmPhoneNumber(phoneRegex.test(profileForm.phone || ''));
     }, [profileForm.phone]);
+    useEffect(() => {
+        if(profileForm){
+            setAccountForm({...accountForm, profile: profileForm})
+        }
+    }, [profileForm]);
 
 
     const onClickAnonymousName = async () => {
         const res = await API.account.getRandName()
-        if (res.status_code === 200) {
-            setProfileForm({...profileForm, anonymous_name: res.result.anonymous_name})
+        if (res.status === 200) {
+            setProfileForm({...profileForm, anonymous_name: res.data})
         } else {
             setProfileForm({...profileForm, anonymous_name: ''})
+        }
+    }
+
+    const onClickSignup = async () => {
+        const res = await API.account.createUser(accountForm)
+        if (res === 201) {
+            setShowSuccessAlert(true);
+        }
+        else {
+            setShowFailedAlert(false)
         }
     }
 
@@ -108,37 +117,6 @@ function Signup() {
                                     </div>
 
                                     <div className="col-span-3 sm:col-span-3">
-                                        <label htmlFor="eng-name"
-                                               className="block text-md font-bold  text-gray-700">
-                                            영어 이름*
-                                        </label>
-                                        <input
-                                            type="text"
-                                            name="name"
-                                            id="eng-name"
-                                            autoComplete="eng-name"
-                                            value={profileForm.eng_name}
-                                            onChange={(e) => {
-                                                setProfileForm({...profileForm, eng_name: e.target.value})
-                                            }}
-                                            onBlur={() => {
-                                                setInputTouched({
-                                                    ...inputTouched,
-                                                    eng_name: profileForm.eng_name === '' ? false : true
-                                                })
-                                            }}
-                                            placeholder="영어 닉네임을 입력해주세요. ex) Jay, Wynn..."
-                                            className={`input input-sm mt-2 block w-full  shadow-sm focus:ring-orange-500 sm:text-sm
-                                            ${confirmEngName || !inputTouched.eng_name ? 'border-gray-300 focus:border-orange-500 focus:ring-orange-500' : 'border-red-600 focus:border-red-700 focus:ring-red-500'}
-                                            `}
-                                        />
-                                        <div
-                                            className={`text-xs mt-1 pl-2 text-red-600 ${confirmEngName || !inputTouched.eng_name ? 'hidden' : ''}`}>
-                                            영어로 입력해주세요.
-                                        </div>
-                                    </div>
-
-                                    <div className="col-span-3 sm:col-span-3">
                                         <label htmlFor="email-address"
                                                className="block text-md font-bold text-gray-700">
                                             Email 주소*
@@ -149,7 +127,7 @@ function Signup() {
                                             id="email-address"
                                             autoComplete="email"
                                             value={accountForm.email}
-                                            placeholder="회사 이메일 주소를 입력해주세요. ex) jay@datamarketing.co.kr"
+                                            placeholder="이메일 주소를 입력해주세요. ex) kwj@zwoni.com"
                                             onChange={(e) => {
                                                 setAccountForm({...accountForm, email: e.target.value})
                                             }}
@@ -199,7 +177,7 @@ function Signup() {
                                         </div>
                                     </div>
 
-                                    <div className="col-span-6 sm:col-span-3 lg:col-span-3">
+                                    <div className="col-span-3 sm:col-span-3 lg:col-span-3">
                                         <label htmlFor="anonymous" className="block text-md font-bold text-gray-700">
                                             익명 이름*
                                         </label>
@@ -222,7 +200,6 @@ function Signup() {
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="col-span-3 sm:col-span-3"/>
                                     <div className="col-span-3 sm:col-span-3">
                                         <label htmlFor="password"
                                                className="block text-md font-bold  text-gray-700">
@@ -300,13 +277,10 @@ function Signup() {
                                     className="btn inline-flex justify-center border border-transparent bg-orange-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-orange-700
                                     focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2
                                     "
-                                    onClick={() => {
-                                        setShowAlert(true)
-                                    }}
+                                    onClick={onClickSignup}
                                     disabled={
-                                        !(confirmEngName&&confirmEmail&&confirmPassword&&confirmPasswordSame&&profileForm.anonymous_name!=='')
+                                        !(confirmEmail&&confirmPassword&&confirmPasswordSame&&profileForm.anonymous_name!=='')
                                     }
-                                    // onClick={()=>{window.location.href = "/login"}}
                                 >
                                     회원가입하기
                                 </button>
@@ -315,10 +289,14 @@ function Signup() {
                     </form>
                 </div>
             </div>
-            <Alert message={"로그인을 진행하시겠습니까?"} onConfirm={() => {
-                setAccountForm({...accountForm, profile: profileForm})
-                setShowAlert(false)
-            }} show={showAlert}/>
+            <Alert message={"회원가입이 완료되었습니다."} onConfirm={() => {
+                setShowSuccessAlert(false)
+                navigate('/login')
+            }} show={showSuccessAlert}/>
+            <Alert message={"회원가입이 실패했습니다. 다시 시도해주세요."} onConfirm={() => {
+                setShowFailedAlert(false)
+                navigate('/login')
+            }} show={showFailedAlert}/>
         </>
     )
 }
